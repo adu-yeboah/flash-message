@@ -7,13 +7,13 @@ A simple and lightweight flash message library for React applications, styled wi
 Install the package via npm:
 
 ```sh
-npm install flash-message-js
+npm install flashmessage-js
 ```
 
 or via yarn:
 
 ```sh
-yarn add flash-message-js
+yarn add flashmessage-js
 ```
 
 ## Usage
@@ -22,14 +22,14 @@ yarn add flash-message-js
 
 ```tsx
 import React from 'react';
-import { FlashProvider } from 'flash-message-js';
+import { FlashMessageProvider } from 'flash-message-js';
 import App from './App';
 
 const Root = () => {
   return (
-    <FlashProvider>
+    <FlashMessageProvider>
       <App />
-    </FlashProvider>
+    </FlashMessageProvider>
   );
 };
 
