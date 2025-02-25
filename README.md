@@ -43,10 +43,10 @@ import React from 'react';
 import { useFlashMessage } from 'flash-message-js';
 
 const MyComponent = () => {
-  const { showMessage } = useFlashMessage();
+  const { showFlashMessage } = useFlashMessage();
 
   return (
-    <button onClick={() => showMessage('This is a flash message!', 'success')}>
+    <button onClick={() => showFlashMessage('This is a flash message!', 'success')}>
       Show Message
     </button>
   );
