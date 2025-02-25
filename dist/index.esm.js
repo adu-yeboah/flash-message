@@ -1,4 +1,4 @@
-import require$$0 from 'react';
+import require$$0, { createContext } from 'react';
 
 var jsxRuntime = {exports: {}};
 
@@ -725,15 +725,13 @@ function requireJsxRuntime () {
 
 var jsxRuntimeExports = requireJsxRuntime();
 
+// Create the context
+createContext(undefined);
 const FlashMessage = ({ message, type, onDismiss }) => {
     if (!message)
         return null;
-    const bgColor = type === "success"
-        ? "bg-green-500"
-        : type === "info"
-            ? "bg-blue-500"
-            : "bg-red-500";
-    return (jsxRuntimeExports.jsx("div", { className: `fixed top-4 z-50 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md text-white shadow-lg ${bgColor}`, style: { maxWidth: '90%', textAlign: 'center' }, onClick: onDismiss, children: message }));
+    const bgColor = type === "success" ? "bg-green-500" : type === "info" ? "bg-blue-500" : "bg-red-500";
+    return (jsxRuntimeExports.jsx("div", { className: `fixed top-4 z-50 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md text-white shadow-lg ${bgColor}`, style: { maxWidth: "90%", textAlign: "center" }, onClick: onDismiss, children: message }));
 };
 
 export { FlashMessage as FlashMessageProvider };
