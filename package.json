@@ -1,5 +1,5 @@
 {
-  "name": "flash-message-js",
+  "name": "flashmessage-js",
   "version": "1.0.2",
   "scripts": {
     "build": "rollup -c"

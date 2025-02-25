@@ -728,13 +728,32 @@ function requireJsxRuntime () {
 var jsxRuntimeExports = requireJsxRuntime();
 
 // Create the context
-require$$0.createContext(undefined);
+const FlashMessageContext = require$$0.createContext(undefined);
 const FlashMessage = ({ message, type, onDismiss }) => {
     if (!message)
         return null;
     const bgColor = type === "success" ? "bg-green-500" : type === "info" ? "bg-blue-500" : "bg-red-500";
     return (jsxRuntimeExports.jsx("div", { className: `fixed top-4 z-50 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md text-white shadow-lg ${bgColor}`, style: { maxWidth: "90%", textAlign: "center" }, onClick: onDismiss, children: message }));
 };
+// FlashMessageProvider component
+const FlashMessageProvider = ({ children }) => {
+    const [flashMessage, setFlashMessage] = require$$0.useState(null);
+    const showFlashMessage = (message, type, duration = 3000) => {
+        setFlashMessage({ message, type });
+        setTimeout(() => setFlashMessage(null), duration);
+    };
+    return (jsxRuntimeExports.jsxs(FlashMessageContext.Provider, { value: { flashMessage, showFlashMessage }, children: [children, flashMessage && (jsxRuntimeExports.jsx(FlashMessage, { message: flashMessage.message, type: flashMessage.type, onDismiss: () => setFlashMessage(null) }))] }));
+};
+// Hook to use the flash message context
+const useFlashMessage = () => {
+    const context = require$$0.useContext(FlashMessageContext);
+    if (!context) {
+        throw new Error("useFlashMessage must be used within a FlashMessageProvider");
+    }
+    return context;
+};
 
-exports.FlashMessageProvider = FlashMessage;
+exports.FlashMessage = FlashMessage;
+exports.FlashMessageProvider = FlashMessageProvider;
+exports.useFlashMessage = useFlashMessage;
 //# sourceMappingURL=index.cjs.js.map
