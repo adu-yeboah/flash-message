@@ -1,10 +1,8 @@
-import resolve from "@rollup/plugin-node-resolve";
-import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
-import postcss from "rollup-plugin-postcss";
+import { defineConfig } from "rollup";
 
-export default {
-  input: "src/index.ts",
+export default defineConfig({
+  input: "src/FlashMessage.tsx", 
   output: [
     {
       file: "dist/index.esm.js",
@@ -15,13 +13,14 @@ export default {
       file: "dist/index.cjs.js",
       format: "cjs",
       sourcemap: true,
-    }
+    },
   ],
+  external: ["react", "react-dom"], 
   plugins: [
-    resolve(),
-    commonjs(),
-    typescript(),
-    postcss({ extract: "styles.css" })
+    typescript({
+      tsconfig: "./tsconfig.json",
+      sourceMap: true,
+      jsx: "react", // Handle JSX
+    }),
   ],
-  external: ["react", "react-dom"]
-};
+});
