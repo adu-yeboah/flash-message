@@ -1,5 +1,6 @@
-"use client";
+"use client";   
 import React, { createContext, useContext, useState, ReactNode } from "react";
+import "./tailwind.css"
 
 interface FlashMessage {
   message: string;
@@ -36,6 +37,7 @@ export const FlashMessageProvider: React.FC<FlashMessageProviderProps> = ({ chil
 
   const showFlashMessage = (message: string, type: "success" | "error" | "info", duration = 3000) => {
     setFlashMessage({ message, type });
+    console.log(message);
     setTimeout(() => setFlashMessage(null), duration);
   };
 

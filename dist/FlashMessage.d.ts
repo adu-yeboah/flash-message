@@ -10,13 +10,13 @@ interface FlashMessageContextProps {
 interface FlashMessageProviderProps {
     children: ReactNode;
 }
+declare const FlashMessage: React.FC<FlashMessageProps>;
+export declare const FlashMessageProvider: React.FC<FlashMessageProviderProps>;
+export declare const useFlashMessage: () => FlashMessageContextProps;
 interface FlashMessageProps {
     message: string | null;
     type: "success" | "error" | "info";
     onDismiss?: () => void;
 }
-declare const FlashMessage: React.FC<FlashMessageProps>;
-export declare const FlashMessageProvider: React.FC<FlashMessageProviderProps>;
-export declare const useFlashMessage: () => FlashMessageContextProps;
 export default FlashMessage;
 //# sourceMappingURL=FlashMessage.d.ts.map
