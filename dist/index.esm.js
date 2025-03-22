@@ -4,8 +4,16 @@ const FlashMessageContext = createContext(undefined);
 const FlashMessage = ({ message, type, onDismiss }) => {
     if (!message)
         return null;
-    const bgColor = type === "success" ? "bg-green-500" : type === "info" ? "bg-blue-500" : "bg-red-500";
-    return (React.createElement("div", { className: `fixed top-4 z-50 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md text-white shadow-lg ${bgColor}`, style: { maxWidth: "90%", textAlign: "center" }, onClick: onDismiss }, message));
+    return (React.createElement("div", { style: {
+            position: "fixed",
+            top: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            backgroundColor: type === "success" ? "green" : type === "info" ? "blue" : "red",
+            color: "white",
+            padding: "10px",
+            zIndex: 50,
+        }, onClick: onDismiss }, message));
 };
 const FlashMessageProvider = ({ children }) => {
     const [flashMessage, setFlashMessage] = useState(null);
@@ -19,11 +27,10 @@ const FlashMessageProvider = ({ children }) => {
 };
 const useFlashMessage = () => {
     const context = useContext(FlashMessageContext);
-    if (!context) {
+    if (!context)
         throw new Error("useFlashMessage must be used within a FlashMessageProvider");
-    }
     return context;
 };
 
-export { FlashMessageProvider, FlashMessage as default, useFlashMessage };
+export { FlashMessage, FlashMessageProvider, useFlashMessage };
 //# sourceMappingURL=index.esm.js.map

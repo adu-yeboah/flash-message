@@ -10,7 +10,7 @@ interface FlashMessageContextProps {
 interface FlashMessageProviderProps {
     children: ReactNode;
 }
-declare const FlashMessage: React.FC<FlashMessageProps>;
+export declare const FlashMessage: React.FC<FlashMessageProps>;
 export declare const FlashMessageProvider: React.FC<FlashMessageProviderProps>;
 export declare const useFlashMessage: () => FlashMessageContextProps;
 interface FlashMessageProps {
@@ -18,5 +18,5 @@ interface FlashMessageProps {
     type: "success" | "error" | "info";
     onDismiss?: () => void;
 }
-export default FlashMessage;
+export {};
 //# sourceMappingURL=FlashMessage.d.ts.map
