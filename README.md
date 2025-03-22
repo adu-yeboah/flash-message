@@ -1,6 +1,6 @@
 # Flash Message JS
 
-A simple and lightweight flash message library for React applications, styled with Tailwind CSS.
+A simple and lightweight flash message library for React applications, styled with CSS.
 
 ## Installation
 

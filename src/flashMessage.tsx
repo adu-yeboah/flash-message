@@ -17,7 +17,7 @@ interface FlashMessageProviderProps {
   children: ReactNode;
 }
 
-const FlashMessage: React.FC<FlashMessageProps> = ({ message, type, onDismiss }) => {
+export const FlashMessage: React.FC<FlashMessageProps> = ({ message, type, onDismiss }) => {
   if (!message) return null;
   return (
     <div
