@@ -8,13 +8,15 @@ export default defineConfig({
       file: "dist/index.esm.js",
       format: "esm",
       sourcemap: true,
-      exports: "named"
+      exports: "named",
+      banner: '"use client";',
     },
     {
       file: "dist/index.cjs.js",
       format: "cjs",
       sourcemap: true,
-      exports: "named"
+      exports: "named",
+      banner: '"use client";',
     },
   ],
   external: ["react", "react-dom"], 

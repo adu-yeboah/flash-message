@@ -1,3 +1,4 @@
+"use client"; //for NEXT JS applications 
 import React, { 
   createContext, 
   useContext, 
