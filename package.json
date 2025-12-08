@@ -4,7 +4,7 @@
   "description": "A modern, lightweight, and fully customizable flash message library for React applications",
   "scripts": {
     "build": "rollup -c",
-    "test": "jest --passWithNoTests"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
