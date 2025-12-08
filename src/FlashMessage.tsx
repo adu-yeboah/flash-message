@@ -32,11 +32,11 @@ const FlashMessageContext = createContext<FlashMessageContextProps | undefined>(
 );
 
 // Individual Flash Message Item Component
-const FlashMessageItem: React.FC<FlashMessageItemProps> = ({ 
+function FlashMessageItem ({ 
   message, 
   onDismiss, 
   theme 
-}) => {
+}: FlashMessageItemProps) {
   const [isExiting, setIsExiting] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(100);
@@ -151,12 +151,12 @@ const FlashMessageItem: React.FC<FlashMessageItemProps> = ({
 };
 
 // Main Provider Component
-export const FlashMessageProvider: React.FC<FlashMessageProviderProps> = ({ 
+export function FlashMessageProvider ({ 
   children, 
   defaultPosition = "top",
   maxMessages = 5,
   defaultTheme: customDefaultTheme
-}) => {
+}: FlashMessageProviderProps ) {
   const [messages, setMessages] = useState<FlashMessage[]>([]);
   const [position, setPosition] = useState<FlashMessagePosition>(defaultPosition);
   const [theme, setTheme] = useState<FlashMessageTheme>({

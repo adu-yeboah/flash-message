@@ -12,7 +12,7 @@ const defaultTheme = {
 // Create Context
 const FlashMessageContext = React.createContext(undefined);
 // Individual Flash Message Item Component
-const FlashMessageItem = ({ message, onDismiss, theme }) => {
+function FlashMessageItem({ message, onDismiss, theme }) {
     const [isExiting, setIsExiting] = React.useState(false);
     const [isPaused, setIsPaused] = React.useState(false);
     const [progress, setProgress] = React.useState(100);
@@ -90,9 +90,9 @@ const FlashMessageItem = ({ message, onDismiss, theme }) => {
                 width: `${progress}%`,
                 transition: "width 0.05s linear"
             } }))));
-};
+}
 // Main Provider Component
-const FlashMessageProvider = ({ children, defaultPosition = "top", maxMessages = 5, defaultTheme: customDefaultTheme }) => {
+function FlashMessageProvider({ children, defaultPosition = "top", maxMessages = 5, defaultTheme: customDefaultTheme }) {
     const [messages, setMessages] = React.useState([]);
     const [position, setPosition] = React.useState(defaultPosition);
     const [theme, setTheme] = React.useState(Object.assign(Object.assign({}, defaultTheme), customDefaultTheme));
@@ -165,7 +165,7 @@ const FlashMessageProvider = ({ children, defaultPosition = "top", maxMessages =
         }
       `),
         messages.length > 0 && (React.createElement("div", { style: getPositionStyles() }, messages.map(msg => (React.createElement(FlashMessageItem, { key: msg.id, message: msg, onDismiss: dismissFlashMessage, theme: theme })))))));
-};
+}
 // Custom Hook
 const useFlashMessage = () => {
     const context = React.useContext(FlashMessageContext);
