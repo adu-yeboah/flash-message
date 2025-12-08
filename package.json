@@ -1,6 +1,6 @@
 {
   "name": "flashmessage-js",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A modern, lightweight, and fully customizable flash message library for React applications",
   "scripts": {
     "build": "rollup -c",
