@@ -1,86 +1,241 @@
-# Flash Message JS
+# React FlashMessages 
 
-A simple and lightweight flash message library for React applications, styled with CSS.
+A modern, lightweight, and fully customizable flash message library for React applications.
 
-## Installation
 
-Install the package via npm:
+## ✨ Features
 
-```sh
+-  **Lightweight** - Only 3KB gzipped
+-  **Fully Customizable** - Custom themes, colors, and positions
+-  **Accessible** - ARIA compliant with screen reader support
+-  **Responsive** - Works on all devices and screen sizes
+-  **Fast** - Optimized performance with React hooks
+-  **TypeScript** - Full TypeScript support with type definitions
+-  **Animations** - Smooth enter/exit animations
+-  **Queue Management** - Handle multiple messages elegantly
+
+## 📦 Installation
+
+```bash
 npm install flashmessage-js
 ```
 
-or via yarn:
-
-```sh
+```bash
 yarn add flashmessage-js
 ```
 
-## Usage
+```bash
+pnpm add flashmessage-js
+```
 
-### 1. Wrap Your App with `FlashProvider`
+## 🚀 Quick Start
+
+### 1. Wrap your app with the provider
 
 ```tsx
-import React from 'react';
-import { FlashMessageProvider } from 'flash-message-js';
-import App from './App';
+import { FlashMessageProvider } from 'flashmessage-js';
 
-const Root = () => {
+function App() {
   return (
     <FlashMessageProvider>
-      <App />
+      <YourApp />
     </FlashMessageProvider>
   );
-};
-
-export default Root;
+}
 ```
 
-### 2. Use the Flash Message Hook
+### 2. Use the hook in your components
 
 ```tsx
-import React from 'react';
-import { useFlashMessage } from 'flash-message-js';
+import { useFlashMessage } from 'flashmessage-js';
 
-const MyComponent = () => {
+function MyComponent() {
   const { showFlashMessage } = useFlashMessage();
-
-  return (
-    <button onClick={() => showFlashMessage('This is a flash message!', 'success')}>
-      Show Message
-    </button>
-  );
-};
-
-export default MyComponent;
+  
+  const handleClick = () => {
+    showFlashMessage('Operation successful!', 'success');
+  };
+  
+  return <button onClick={handleClick}>Show Message</button>;
+}
 ```
 
-### 3. Customize Tailwind Styles (Optional)
+## 📖 API Reference
 
-To customize the flash message appearance, extend your Tailwind CSS configuration:
+### FlashMessageProvider Props
 
-```css
-@layer components {
-  .flash-message {
-    @apply fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow-lg;
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `defaultPosition` | `FlashMessagePosition` | `"top"` | Initial position of messages |
+| `maxMessages` | `number` | `5` | Maximum number of messages to display |
+| `defaultTheme` | `FlashMessageTheme` | Default theme | Custom color theme |
+
+### useFlashMessage Hook
+
+```tsx
+const {
+  showFlashMessage,    // Show a new message
+  dismissFlashMessage, // Dismiss specific message by ID
+  clearAllMessages,    // Clear all messages
+  position,            // Current position
+  setPosition,         // Change position dynamically
+  theme,               // Current theme
+  setTheme            // Change theme dynamically
+} = useFlashMessage();
+```
+
+### showFlashMessage
+
+```tsx
+showFlashMessage(
+  message: string,
+  type: "success" | "error" | "info" | "warning",
+  options?: {
+    duration?: number // milliseconds, default: 3000
+  }
+): string // Returns message ID
+```
+
+### Message Types
+
+- `success` - Green success messages
+- `error` - Red error messages
+- `info` - Blue informational messages
+- `warning` - Orange/yellow warning messages
+
+### Positions
+
+- `top` - Top center
+- `bottom` - Bottom center
+- `top-left` - Top left corner
+- `top-right` - Top right corner
+- `bottom-left` - Bottom left corner
+- `bottom-right` - Bottom right corner
+
+## 🎨 Custom Themes
+
+```tsx
+import { useFlashMessage } from 'flashmessage-js';
+import type { FlashMessageTheme } from 'flashmessage-js';
+
+function MyComponent() {
+  const { setTheme } = useFlashMessage();
+  
+  const customTheme: FlashMessageTheme = {
+    success: {
+      bg: "#00d9ff",
+      dark: "#00b8d4",
+      text: "#000000"
+    },
+    error: {
+      bg: "#ff006e",
+      dark: "#d90058",
+      text: "#ffffff"
+    },
+    info: {
+      bg: "#8338ec",
+      dark: "#6930c3",
+      text: "#ffffff"
+    },
+    warning: {
+      bg: "#ffbe0b",
+      dark: "#fb8500",
+      text: "#000000"
+    }
+  };
+  
+  return (
+    <button onClick={() => setTheme(customTheme)}>
+      Apply Custom Theme
+    </button>
+  );
+}
+```
+
+## 📝 Examples
+
+### Basic Usage
+
+```tsx
+const { showFlashMessage } = useFlashMessage();
+
+// Success message
+showFlashMessage('Data saved successfully!', 'success');
+
+// Error message
+showFlashMessage('Failed to save data', 'error');
+
+// Info message
+showFlashMessage('New update available', 'info');
+
+// Warning message
+showFlashMessage('Your session will expire soon', 'warning');
+```
+
+### Custom Duration
+
+```tsx
+// Show for 5 seconds
+showFlashMessage('Long message', 'info', { duration: 5000 });
+
+// Show indefinitely (manual dismiss only)
+showFlashMessage('Manual dismiss', 'success', { duration: 0 });
+```
+
+### Form Validation
+
+```tsx
+async function handleSubmit(e: React.FormEvent) {
+  e.preventDefault();
+  
+  try {
+    await saveData(formData);
+    showFlashMessage('Form submitted successfully!', 'success');
+  } catch (error) {
+    showFlashMessage(error.message, 'error');
   }
 }
 ```
 
-## Props
+### API Requests with Loading State
 
-The `showMessage` function supports:
+```tsx
+async function fetchData() {
+  const id = showFlashMessage('Loading data...', 'info', { duration: 0 });
+  
+  try {
+    const result = await api.getData();
+    dismissFlashMessage(id);
+    showFlashMessage('Data loaded successfully!', 'success');
+  } catch (error) {
+    dismissFlashMessage(id);
+    showFlashMessage('Failed to load data', 'error');
+  }
+}
+```
 
-| Parameter | Type   | Description |
-|-----------|--------|-------------|
-| message  | string | The message text to display |
-| type     | 'success' \| 'error' \| 'info' | Message type (affects styling) |
-| duration | number | (Optional) Time in milliseconds before disappearing |
+### Change Position Dynamically
 
-## Contributing
+```tsx
+const { setPosition, showFlashMessage } = useFlashMessage();
 
-Contributions are welcome! Feel free to submit issues or pull requests on [GitHub](https://github.com/adu-yeboah/flash-message).
+<button onClick={() => {
+  setPosition('top-right');
+  showFlashMessage('Messages now appear top-right', 'info');
+}}>
+  Move to Top Right
+</button>
+```
 
-## License
+## 🤝 Contributing
 
-This project is licensed under the ISC License.
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+MIT © Adu Yeboah
+
+
+## ⭐ Show your support
+
+Give a ⭐️ if this project helped you!

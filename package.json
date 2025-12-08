@@ -3,13 +3,14 @@
   "version": "1.0.8",
   "description": "A modern, lightweight, and fully customizable flash message library for React applications",
   "scripts": {
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "test": "jest --passWithNoTests"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/adu-yeboah/flash-message"
   },
-  "homepage": "https://github.com/adu-yeboah/flash-message#readme",
+  "homepage": "https://flashmessage-docs.vercel.app/",
   "keywords": [
     "flash-message",
     "react",
@@ -38,6 +39,8 @@
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "^12.1.2",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.2.0",
     "rollup": "^4.34.8",
     "rollup-plugin-dts": "^6.1.1",
     "rollup-plugin-postcss": "^4.0.2",
