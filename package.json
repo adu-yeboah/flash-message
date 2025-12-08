@@ -1,6 +1,7 @@
 {
   "name": "flashmessage-js",
-  "version": "1.0.7",
+  "version": "1.0.8",
+  "description": "A modern, lightweight, and fully customizable flash message library for React applications",
   "scripts": {
     "build": "rollup -c"
   },
@@ -13,7 +14,15 @@
     "flash-message",
     "react",
     "tailwind",
-    "notifications"
+    "notifications",
+    "toast",
+    "notifications",
+    "alerts",
+    "snackbar",
+    "message",
+    "notification",
+    "react-component",
+    "typescript"
   ],
   "files": [
     "dist",
@@ -25,7 +34,6 @@
   "types": "dist/index.d.ts",
   "type": "module",
   "license": "ISC",
-  "description": "A simple flash message library with Tailwind CSS",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",

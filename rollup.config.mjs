@@ -8,11 +8,13 @@ export default defineConfig({
       file: "dist/index.esm.js",
       format: "esm",
       sourcemap: true,
+      exports: "named"
     },
     {
       file: "dist/index.cjs.js",
       format: "cjs",
       sourcemap: true,
+      exports: "named"
     },
   ],
   external: ["react", "react-dom"], 
@@ -20,7 +22,7 @@ export default defineConfig({
     typescript({
       tsconfig: "./tsconfig.json",
       sourceMap: true,
-      jsx: "react", // Handle JSX
+      jsx: "react", 
     }),
   ],
 });
