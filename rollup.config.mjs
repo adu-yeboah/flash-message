@@ -8,13 +8,13 @@ export default defineConfig({
       file: "dist/index.esm.js",
       format: "esm",
       sourcemap: true,
-      exports: "named"
+      // exports: "named"
     },
     {
       file: "dist/index.cjs.js",
       format: "cjs",
       sourcemap: true,
-      exports: "named"
+      // exports: "named"
     },
   ],
   external: ["react", "react-dom"], 
