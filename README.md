@@ -3,7 +3,7 @@
 A modern, lightweight, and fully customizable flash message library for React applications.
 
 
-## ✨ Features
+##  Features
 
 -  **Lightweight** - Only 3KB gzipped
 -  **Fully Customizable** - Custom themes, colors, and positions
@@ -14,7 +14,7 @@ A modern, lightweight, and fully customizable flash message library for React ap
 -  **Animations** - Smooth enter/exit animations
 -  **Queue Management** - Handle multiple messages elegantly
 
-## 📦 Installation
+##  Installation
 
 ```bash
 npm install flashmessage-js
@@ -28,7 +28,7 @@ yarn add flashmessage-js
 pnpm add flashmessage-js
 ```
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Wrap your app with the provider
 
@@ -60,7 +60,7 @@ function MyComponent() {
 }
 ```
 
-## 📖 API Reference
+##  API Reference
 
 ### FlashMessageProvider Props
 
@@ -112,7 +112,7 @@ showFlashMessage(
 - `bottom-left` - Bottom left corner
 - `bottom-right` - Bottom right corner
 
-## 🎨 Custom Themes
+##  Custom Themes
 
 ```tsx
 import { useFlashMessage } from 'flashmessage-js';
@@ -152,7 +152,7 @@ function MyComponent() {
 }
 ```
 
-## 📝 Examples
+##  Examples
 
 ### Basic Usage
 
@@ -227,15 +227,15 @@ const { setPosition, showFlashMessage } = useFlashMessage();
 </button>
 ```
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📄 License
+##  License
 
 MIT © Adu Yeboah
 
 
-## ⭐ Show your support
+##  Show your support
 
-Give a ⭐️ if this project helped you!
+Give a  if this project helped you!
