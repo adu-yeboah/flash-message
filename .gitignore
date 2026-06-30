@@ -4,8 +4,7 @@ package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
-# Build output
-dist/
+# Build output (keep dist/ for published npm package)
 build/
 *.tsbuildinfo
 
