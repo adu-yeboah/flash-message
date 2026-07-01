@@ -1,57 +1,84 @@
 "use client"; //for NEXT JS applications
 import React, {
-  createContext,
-  useContext,
   useState,
   useCallback,
   useEffect,
   useRef,
+  useMemo,
 } from "react";
-import {
-  FlashMessage,
-  FlashMessageType,
-  FlashMessagePosition,
-  FlashMessageTheme,
-  FlashMessageOptions,
-  FlashMessageContextProps,
-  FlashMessageProviderProps,
-  FlashMessageItemProps,
-  ColorScheme,
-} from "./types";
+import { FlashMessageItemProps, TransitionPreset } from "./types";
+import { resolveColor } from "./theme";
 
-// Default theme configuration
-export const defaultTheme: FlashMessageTheme = {
-  success: { bg: "#10b981", dark: "#059669", text: "#ffffff" },
-  error: { bg: "#ef4444", dark: "#dc2626", text: "#ffffff" },
-  info: { bg: "#3b82f6", dark: "#2563eb", text: "#ffffff" },
-  warning: { bg: "#f59e0b", dark: "#d97706", text: "#ffffff" },
+//  Animation Keyframe Map ──
+const ENTER_ANIMATION: Record<
+  TransitionPreset,
+  Record<"top" | "bottom", string>
+> = {
+  slide: {
+    top: "fm-slide-in-top",
+    bottom: "fm-slide-in-bottom",
+  },
+  fade: {
+    top: "fm-fade-in",
+    bottom: "fm-fade-in",
+  },
+  scale: {
+    top: "fm-scale-in",
+    bottom: "fm-scale-in",
+  },
+  bounce: {
+    top: "fm-bounce-in",
+    bottom: "fm-bounce-in",
+  },
+  flip: {
+    top: "fm-flip-in",
+    bottom: "fm-flip-in",
+  },
 };
 
-// Create Context
-const FlashMessageContext = createContext<FlashMessageContextProps | undefined>(
-  undefined,
-);
-
 // Individual Flash Message Item Component
-function FlashMessageItem({
+export default function FlashMessageItem({
   message,
   onDismiss,
+  position,
   theme,
+  containerStyle, 
 }: FlashMessageItemProps) {
   const [isExiting, setIsExiting] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(100);
 
+  // Stable ref for onDismiss to avoid stale closures in the timer
   const onDismissRef = useRef(onDismiss);
-  onDismissRef.current = onDismiss;
+  useEffect(() => {
+    onDismissRef.current = onDismiss;
+  }, [onDismiss]);
 
+  // Resolve color based on type + variant
+  const color = useMemo(
+    () => resolveColor(message.type, theme),
+    [message.type, theme],
+  );
+
+  const isOutline = theme.variant === "outline";
+  const isSubtle = theme.variant === "subtle";
+
+  //  Determine animation
+  const transition = message.transition ?? "slide";
+  const isBottom = position.startsWith("bottom");
+  const verticalKey = isBottom ? "bottom" : "top";
+  const enterAnimationName = ENTER_ANIMATION[transition][verticalKey];
+
+  //  Dismiss handler (stable via ref) ──
   const handleDismiss = useCallback(() => {
     setIsExiting(true);
-    setTimeout(() => onDismissRef.current(message.id), 300);
+    setTimeout(() => onDismissRef.current(message.id), 350);
   }, [message.id]);
 
+  //  Auto-dismiss timer with progress bar ─
   useEffect(() => {
     if (!message.duration || isPaused) return;
+
     const interval = 50;
     const decrement = (interval / message.duration) * 100;
 
@@ -69,8 +96,29 @@ function FlashMessageItem({
     return () => clearInterval(timer);
   }, [message.duration, isPaused, handleDismiss]);
 
-  // Get color scheme for message type
-  const color: ColorScheme = theme[message.type] || defaultTheme[message.type]!;
+  const itemStyle: React.CSSProperties = {
+    backgroundColor: color.bg,
+    color: color.text || "#ffffff",
+    padding: theme.padding ?? "12px 16px",
+    borderRadius: theme.borderRadius ?? "10px",
+    boxShadow: isOutline
+      ? "none"
+      : (theme.shadow ?? "0 4px 14px rgba(0,0,0,0.12)"),
+    border: isOutline ? `2px solid ${color.dark}` : "none",
+    maxWidth: theme.maxWidth ?? "420px",
+    minWidth: theme.minWidth ?? "280px",
+    cursor: "pointer",
+    opacity: isExiting ? 0 : 1,
+    transform: isExiting
+      ? `translateY(${isBottom ? "20px" : "-20px"}) scale(0.96)`
+      : "translateY(0) scale(1)",
+    transition: `all ${theme.animationDuration ?? "0.35s"} ${theme.animationEasing ?? "cubic-bezier(0.22, 1, 0.36, 1)"}`,
+    animation: `${enterAnimationName} ${theme.animationDuration ?? "0.35s"} ${theme.animationEasing ?? "cubic-bezier(0.22, 1, 0.36, 1)"}`,
+    position: "relative",
+    overflow: "hidden",
+    fontFamily: theme.fontFamily ?? "inherit",
+    ...containerStyle,
+  };
 
   return (
     <div
@@ -79,68 +127,98 @@ function FlashMessageItem({
       aria-atomic="true"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      style={{
-        backgroundColor: color.bg,
-        color: color.text || "#ffffff",
-        padding: "12px 16px",
-        borderRadius: "8px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        marginBottom: "10px",
-        minWidth: "300px",
-        maxWidth: "500px",
-        cursor: "pointer",
-        opacity: isExiting ? 0 : 1,
-        transform: isExiting ? "translateY(-20px)" : "translateY(0)",
-        transition: "all 0.3s ease-in-out",
-        animation: "flashMessageSlideIn 0.3s ease-out",
-        position: "relative",
-        overflow: "hidden",
-      }}
+      style={itemStyle}
       onClick={handleDismiss}
     >
-      {/* Message content and close button */}
+      {/* Message content row */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          gap: "10px",
         }}
       >
-        <span style={{ flex: 1, marginRight: "12px" }}>{message.message}</span>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleDismiss();
-          }}
-          aria-label="Close message"
-          style={{
-            background: "none",
-            border: "none",
-            color: color.text || "#ffffff",
-            fontSize: "20px",
-            cursor: "pointer",
-            padding: "0",
-            width: "24px",
-            height: "24px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: 0.8,
-          }}
-        >
-          ×
-        </button>
+        {/* Icon */}
+        {color.icon && (
+          <span
+            style={{
+              fontSize: "16px",
+              flexShrink: 0,
+              width: "24px",
+              height: "24px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "50%",
+              backgroundColor:
+                isSubtle || isOutline
+                  ? `${color.dark}20`
+                  : "rgba(255,255,255,0.2)",
+            }}
+          >
+            {color.icon}
+          </span>
+        )}
+
+        {/* Text */}
+        <span style={{ flex: 1, fontSize: "14px", lineHeight: "1.4" }}>
+          {message.message}
+        </span>
+
+        {/* Close button */}
+        {theme.showCloseButton !== false && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDismiss();
+            }}
+            aria-label="Close message"
+            style={{
+              background: "none",
+              border: "none",
+              color:
+                isSubtle || isOutline ? color.dark : color.text || "#ffffff",
+              fontSize: "18px",
+              cursor: "pointer",
+              padding: "0",
+              width: "24px",
+              height: "24px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: 0.7,
+              borderRadius: "4px",
+              transition: "opacity 0.15s, background 0.15s",
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "rgba(255,255,255,0.15)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.opacity = "0.7";
+              (e.currentTarget as HTMLButtonElement).style.background = "none";
+            }}
+          >
+            ×
+          </button>
+        )}
       </div>
 
       {/* Progress bar */}
-      {message.duration && (
+      {message.duration && theme.showProgress !== false && (
         <div
           style={{
             position: "absolute",
             bottom: 0,
             left: 0,
-            height: "3px",
-            backgroundColor: color.dark,
+            height: theme.progressHeight ?? "3px",
+            backgroundColor:
+              isSubtle || isOutline
+                ? color.dark
+                : color.dark || "rgba(0,0,0,0.15)",
             width: `${progress}%`,
             transition: "width 0.05s linear",
           }}
@@ -149,148 +227,3 @@ function FlashMessageItem({
     </div>
   );
 }
-
-// Main Provider Component
-export function FlashMessageProvider({
-  children,
-  defaultPosition = "top",
-  maxMessages = 5,
-  defaultTheme: customDefaultTheme,
-}: FlashMessageProviderProps) {
-  const [messages, setMessages] = useState<FlashMessage[]>([]);
-  const [position, setPosition] =
-    useState<FlashMessagePosition>(defaultPosition);
-  const [theme, setTheme] = useState<FlashMessageTheme>({
-    ...defaultTheme,
-    ...customDefaultTheme,
-  });
-
-  // Show a new flash message
-  const showFlashMessage = useCallback(
-    (
-      message: string,
-      type: FlashMessageType,
-      options: FlashMessageOptions = {},
-    ): string => {
-      const id = `flash-${Date.now()}-${Math.random()}`;
-      const duration = options.duration ?? 3000;
-
-      setMessages((prev) => {
-        const newMessages = [...prev, { id, message, type, duration }];
-        return newMessages.slice(-maxMessages);
-      });
-
-      return id;
-    },
-    [maxMessages],
-  );
-
-  // Dismiss a specific message by ID
-  const dismissFlashMessage = useCallback((id: string) => {
-    setMessages((prev) => prev.filter((msg) => msg.id !== id));
-  }, []);
-
-  // Clear all messages
-  const clearAllMessages = useCallback(() => {
-    setMessages([]);
-  }, []);
-
-  // Calculate position styles based on position prop
-  const getPositionStyles = (): React.CSSProperties => {
-    const base: React.CSSProperties = {
-      position: "fixed",
-      zIndex: 9999,
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-    };
-
-    switch (position) {
-      case "top":
-        return {
-          ...base,
-          top: "20px",
-          left: "50%",
-          transform: "translateX(-50%)",
-        };
-      case "bottom":
-        return {
-          ...base,
-          bottom: "20px",
-          left: "50%",
-          transform: "translateX(-50%)",
-        };
-      case "top-left":
-        return { ...base, top: "20px", left: "20px" };
-      case "top-right":
-        return { ...base, top: "20px", right: "20px" };
-      case "bottom-left":
-        return { ...base, bottom: "20px", left: "20px" };
-      case "bottom-right":
-        return { ...base, bottom: "20px", right: "20px" };
-      default:
-        return {
-          ...base,
-          top: "20px",
-          left: "50%",
-          transform: "translateX(-50%)",
-        };
-    }
-  };
-
-  return (
-    <FlashMessageContext.Provider
-      value={{
-        messages,
-        showFlashMessage,
-        dismissFlashMessage,
-        clearAllMessages,
-        position,
-        setPosition,
-        theme,
-        setTheme,
-      }}
-    >
-      {children}
-
-      {/* CSS Animation */}
-      <style>{`
-        @keyframes flashMessageSlideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
-
-      {/* Message Container */}
-      {messages.length > 0 && (
-        <div style={getPositionStyles()}>
-          {messages.map((msg) => (
-            <FlashMessageItem
-              key={msg.id}
-              message={msg}
-              onDismiss={dismissFlashMessage}
-              theme={theme}
-            />
-          ))}
-        </div>
-      )}
-    </FlashMessageContext.Provider>
-  );
-}
-
-// Custom Hook
-export const useFlashMessage = (): FlashMessageContextProps => {
-  const context = useContext(FlashMessageContext);
-  if (!context) {
-    throw new Error(
-      "useFlashMessage must be used within a FlashMessageProvider",
-    );
-  }
-  return context;
-};

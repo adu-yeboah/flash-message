@@ -1,5 +1,9 @@
-export { FlashMessageProvider, useFlashMessage } from "./FlashMessage";
+export { FlashMessageProvider, useFlashMessage } from "./FlashMessageProvider";
 
+// Theme utilities
+export { defaultTheme, mergeTheme, resolveColor } from "./theme";
+
+// Types
 export type {
   FlashMessageType,
   FlashMessagePosition,
@@ -8,7 +12,7 @@ export type {
   FlashMessageTheme,
   FlashMessageOptions,
   FlashMessageContextProps,
-  FlashMessageProviderProps
+  FlashMessageProviderProps,
+  FlashMessageItemProps,
+  TransitionPreset,
 } from "./types";
-
-export { defaultTheme } from "./FlashMessage";
