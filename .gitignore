@@ -7,6 +7,8 @@ pnpm-lock.yaml
 # Build output (keep dist/ for published npm package)
 build/
 *.tsbuildinfo
+node_modules/
+dist/
 
 # IDE
 .vscode/

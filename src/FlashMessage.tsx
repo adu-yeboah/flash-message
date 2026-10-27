@@ -12,7 +12,7 @@ import { resolveColor } from "./theme";
 //  Animation Keyframe Map ──
 const ENTER_ANIMATION: Record<
   TransitionPreset,
-  Record<"top" | "bottom", string>
+  Record<"top" | "bottom", string>  
 > = {
   slide: {
     top: "fm-slide-in-top",
