@@ -69,3 +69,13 @@
     transform: perspective(600px) rotateX(0deg) translateY(0);
   }
 }
+
+/* Progress bar countdown (transform-based, paused in sync with the timer) */
+@keyframes fm-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
