@@ -3,3 +3,4 @@ node_modules
 *.md
 .gitignore
 tsconfig.json
+playground
