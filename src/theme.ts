@@ -37,7 +37,16 @@ const celebration: ColorScheme = {
 };
 
 // ─── Default Theme ───────────────────────────────────────────────
-export const defaultTheme: FlashMessageTheme = {
+/** Every message type the library knows about. Add new types here once. */
+export const MESSAGE_TYPES: readonly FlashMessageType[] = [
+  "success",
+  "error",
+  "info",
+  "warning",
+  "celebration",
+];
+
+export const defaultTheme: FlashMessageTheme & Record<FlashMessageType, ColorScheme> = {
   success,
   error,
   info,
@@ -59,6 +68,21 @@ export const defaultTheme: FlashMessageTheme = {
   variant: "solid",
 };
 
+// ─── Helpers ─────────────────────────────────────────────────────
+/** Drop keys whose value is undefined so they cannot overwrite defaults. */
+function defined<T extends object>(obj?: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(obj ?? {}).filter(([, value]) => value !== undefined)
+  ) as Partial<T>;
+}
+
+/** A soft tint of any CSS color. Appending hex alpha only works for #rrggbb. */
+function softBackground(color: string): string {
+  return /^#[0-9a-f]{6}$/i.test(color)
+    ? `${color}18`
+    : `color-mix(in srgb, ${color} 9%, transparent)`;
+}
+
 // ─── Resolve effective color for a type ──────────────────────────
 export function resolveColor(
   type: FlashMessageType,
@@ -66,58 +90,29 @@ export function resolveColor(
   variant?: FlashMessageTheme["variant"]
 ): ColorScheme {
   const effectiveVariant = variant ?? theme.variant ?? "solid";
-  const base = theme[type] ?? defaultTheme[type]!;
-  const fallback = defaultTheme[type]!;
+  const fallback = defaultTheme[type];
+  const user = theme[type];
+
+  const bg = user?.bg ?? fallback.bg;
+  const dark = user?.dark ?? fallback.dark;
+  const text = user?.text ?? fallback.text ?? "#ffffff";
+  // `??` (not `||`) so a user can pass "" to remove the icon.
+  const icon = user?.icon ?? fallback.icon;
 
   if (effectiveVariant === "outline") {
-    return {
-      bg: "transparent",
-      dark: base.dark || fallback.dark,
-      text: base.dark || fallback.dark,
-      // `??` (not `||`) so a user can pass "" to remove the icon.
-      icon: base.icon ?? fallback.icon,
-    };
+    return { bg: "transparent", dark, text: dark, icon };
   }
-
   if (effectiveVariant === "subtle") {
-    return {
-      bg: `${base.bg || fallback.bg}18`,
-      dark: base.dark || fallback.dark,
-      text: base.dark || fallback.dark,
-      icon: base.icon ?? fallback.icon,
-    };
+    return { bg: softBackground(bg), dark, text: dark, icon };
   }
-
-  return {
-    bg: base.bg || fallback.bg,
-    dark: base.dark || fallback.dark,
-    text: base.text || fallback.text || "#ffffff",
-    icon: base.icon ?? fallback.icon,
-  };
+  return { bg, dark, text, icon };
 }
 
 // ─── Merge user theme with defaults ──────────────────────────────
-export function mergeTheme(
-  userTheme?: FlashMessageTheme
-): FlashMessageTheme {
-  if (!userTheme) return { ...defaultTheme };
-  return {
-    ...defaultTheme,
-    ...userTheme,
-    success: userTheme.success
-      ? { ...defaultTheme.success, ...userTheme.success }
-      : defaultTheme.success,
-    error: userTheme.error
-      ? { ...defaultTheme.error, ...userTheme.error }
-      : defaultTheme.error,
-    info: userTheme.info
-      ? { ...defaultTheme.info, ...userTheme.info }
-      : defaultTheme.info,
-    warning: userTheme.warning
-      ? { ...defaultTheme.warning, ...userTheme.warning }
-      : defaultTheme.warning,
-    celebration: userTheme.celebration
-      ? { ...defaultTheme.celebration, ...userTheme.celebration }
-      : defaultTheme.celebration,
-  };
+export function mergeTheme(userTheme?: FlashMessageTheme): FlashMessageTheme {
+  const merged: FlashMessageTheme = { ...defaultTheme, ...defined(userTheme) };
+  for (const type of MESSAGE_TYPES) {
+    merged[type] = { ...defaultTheme[type], ...defined(userTheme?.[type]) };
+  }
+  return merged;
 }

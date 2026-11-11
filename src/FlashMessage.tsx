@@ -39,6 +39,9 @@ const ENTER_ANIMATION: Record<
 };
 
 // Individual Flash Message Item Component
+// Clicks on these never dismiss the message (so links and buttons keep working)
+const INTERACTIVE = 'a, button, input, select, textarea, [role="button"]';
+
 export default function FlashMessageItem({
   message,
   onDismiss,
@@ -59,6 +62,10 @@ export default function FlashMessageItem({
     onDismissRef.current = onDismiss;
   }, [onDismiss]);
 
+  const exiting = useRef(false);
+  const exitTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(exitTimer.current), []);
+
   // Resolve color based on type + variant
   const color = useMemo(
     () => resolveColor(message.type, theme),
@@ -78,12 +85,23 @@ export default function FlashMessageItem({
   const verticalKey = isBottom ? "bottom" : "top";
   const enterAnimationName = ENTER_ANIMATION[transition][verticalKey];
 
-  //  Dismiss handler (stable via ref) ──
+  //  Start the exit animation, then tell the provider to remove us. Safe to
+  //  call many times: only the first call does anything ──
   const exitMs = toMs(theme.animationDuration);
   const handleDismiss = useCallback(() => {
+    if (exiting.current) return;
+    exiting.current = true;
     setIsExiting(true);
-    setTimeout(() => onDismissRef.current(message.id), exitMs);
+    exitTimer.current = setTimeout(() => onDismissRef.current(message.id), exitMs);
   }, [message.id, exitMs]);
+
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest(INTERACTIVE)) return;
+    handleDismiss();
+  };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Escape") handleDismiss();
+  };
 
   //  Fire confetti once, when the message first appears ──
   useEffect(() => {
@@ -160,7 +178,8 @@ export default function FlashMessageItem({
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setIsFocused(false);
       }}
       style={itemStyle}
-      onClick={handleDismiss}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
     >
       {/* Message content row */}
       <div

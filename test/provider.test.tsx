@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { act, screen } from "@testing-library/react";
 import { renderHook } from "@testing-library/react";
 import { mount, ref } from "./helpers";
-import { useFlashMessage } from "../src/index";
+import { useFlashMessage, defaultTheme } from "../src/index";
 
 const show = (text: string, type: "info" | "success" = "info") => {
   let id = "";
@@ -10,9 +10,8 @@ const show = (text: string, type: "info" | "success" = "info") => {
   return id;
 };
 
-// Note: "onDismiss fires exactly once, even in StrictMode" joins in the
-// dismiss-guards phase; "setTheme merges a partial theme" joins in the
-// theme-merge phase, together with those behavior changes.
+// StrictMode onDismiss and setTheme-merge behavior is covered in
+// dismiss.test.tsx and theme.test.ts respectively.
 
 describe("showFlashMessage / dismissFlashMessage", () => {
   it("shows a message and returns its id", () => {
@@ -75,6 +74,14 @@ describe("stacking modes", () => {
 });
 
 describe("theme and position", () => {
+  it("setTheme merges a partial theme over the defaults", () => {
+    mount();
+    act(() => ref.api.setTheme({ success: { bg: "#000000", dark: "#111111" } }));
+    expect(ref.api.theme.success?.bg).toBe("#000000");
+    expect(ref.api.theme.gap).toBe(defaultTheme.gap);
+    expect(ref.api.theme.error).toEqual(defaultTheme.error);
+  });
+
   it("setPosition changes the position", () => {
     mount();
     act(() => ref.api.setPosition("bottom-right"));

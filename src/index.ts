@@ -1,7 +1,7 @@
 export { FlashMessageProvider, useFlashMessage } from "./FlashMessageProvider";
 
 // Theme utilities
-export { defaultTheme, mergeTheme, resolveColor } from "./theme";
+export { defaultTheme, mergeTheme, resolveColor, MESSAGE_TYPES } from "./theme";
 
 // Confetti
 export { fireConfetti, clearConfetti } from "./confetti";

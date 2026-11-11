@@ -6,6 +6,7 @@ import {
   useState,
   useCallback,
   useMemo,
+  useRef,
   type CSSProperties,
   type ReactNode,
 } from "react";
@@ -75,8 +76,23 @@ export function FlashMessageProvider({
 }: FlashMessageProviderProps) {
   const [messages, setMessages] = useState<FlashMessage[]>([]);
   const [position, setPosition] = useState<FlashMessagePosition>(defaultPosition);
-  const [theme, setTheme] = useState<FlashMessageTheme>(
+  const [theme, setThemeState] = useState<FlashMessageTheme>(
     () => mergeTheme(userTheme)
+  );
+
+  // The ref is the source of truth for the list; state only mirrors it for
+  // rendering. That lets us read the current list inside event handlers
+  // without putting side effects inside a state updater function.
+  const store = useRef<FlashMessage[]>([]);
+  const commit = useCallback((next: FlashMessage[]) => {
+    store.current = next;
+    setMessages(next);
+  }, []);
+
+  // A partial theme is merged over the defaults, never replaces them.
+  const setTheme = useCallback(
+    (next: FlashMessageTheme) => setThemeState(mergeTheme(next)),
+    []
   );
 
   //  Show a new flash message 
@@ -100,32 +116,29 @@ export function FlashMessageProvider({
         className: options.className,
       };
 
-      setMessages((prev) => addMessage(prev, newMsg, stacking, maxMessages));
+      commit(addMessage(store.current, newMsg, stacking, maxMessages));
 
       return id;
     },
-    [maxMessages, stacking]
+    [commit, maxMessages, stacking]
   );
 
 
   //  Dismiss a specific message 
   const dismissFlashMessage = useCallback(
     (id: string) => {
-      setMessages((prev) => {
-        const msg = prev.find((m) => m.id === id);
-        if (msg && onDismiss) {
-          onDismiss(id, msg);
-        }
-        return prev.filter((m) => m.id !== id);
-      });
+      const msg = store.current.find((m) => m.id === id);
+      if (!msg) return; // already gone: nothing to do, nothing to report
+      commit(store.current.filter((m) => m.id !== id));
+      onDismiss?.(id, msg); // outside any state updater, so it runs exactly once
     },
-    [onDismiss]
+    [commit, onDismiss]
   );
 
   //  Clear all 
   const clearAllMessages = useCallback(() => {
-    setMessages([]);
-  }, []);
+    commit([]);
+  }, [commit]);
 
   //  Fire a confetti burst on demand, using theme options as the base 
   const confetti = useCallback(
