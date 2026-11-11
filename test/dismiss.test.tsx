@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { act, screen, fireEvent } from "@testing-library/react";
 import { mount, ref } from "./helpers";
 
-const item = (text: string) => screen.getByText(text).closest('[role="alert"]') as HTMLElement;
+const item = (text: string) => screen.getByText(text).closest('[role="alert"], [role="status"]') as HTMLElement;
 const advance = (ms: number) => act(() => { vi.advanceTimersByTime(ms); });
 const show = (text: string, type: "info" | "error" | "success" = "info", duration?: number, node?: React.ReactNode) => {
   act(() => { ref.api.showFlashMessage(node ?? text, type, duration === undefined ? {} : { duration }); });

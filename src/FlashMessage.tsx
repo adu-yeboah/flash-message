@@ -138,6 +138,14 @@ export default function FlashMessageItem({
     };
   }, [hasTimer, paused, handleDismiss]);
 
+  //  Errors and warnings interrupt the screen reader; the rest wait politely ──
+  const urgent = message.type === "error" || message.type === "warning";
+
+  // Users who prefer reduced motion get toasts without enter/exit animation.
+  const prefersReducedMotion =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   const itemStyle: React.CSSProperties = {
     backgroundColor: color.bg,
     color: color.text || "#ffffff",
@@ -154,8 +162,15 @@ export default function FlashMessageItem({
     transform: isExiting
       ? `translateY(${isBottom ? "20px" : "-20px"}) scale(0.96)`
       : "translateY(0) scale(1)",
-    transition: `all ${theme.animationDuration ?? "0.35s"} ${theme.animationEasing ?? "cubic-bezier(0.22, 1, 0.36, 1)"}`,
-    animation: `${enterAnimationName} ${theme.animationDuration ?? "0.35s"} ${theme.animationEasing ?? "cubic-bezier(0.22, 1, 0.36, 1)"}`,
+    // Longhands (not the `animation` shorthand) so jsdom and tests can read them
+    ...(prefersReducedMotion
+      ? {}
+      : {
+          transition: `all ${theme.animationDuration ?? "0.35s"} ${theme.animationEasing ?? "cubic-bezier(0.22, 1, 0.36, 1)"}`,
+          animationName: enterAnimationName,
+          animationDuration: theme.animationDuration ?? "0.35s",
+          animationTimingFunction: theme.animationEasing ?? "cubic-bezier(0.22, 1, 0.36, 1)",
+        }),
     position: "relative",
     overflow: "hidden",
     fontFamily: theme.fontFamily ?? "inherit",
@@ -165,8 +180,8 @@ export default function FlashMessageItem({
   return (
     <div
       ref={rootRef}
-      role="alert"
-      aria-live="assertive"
+      role={urgent ? "alert" : "status"}
+      aria-live={urgent ? "assertive" : "polite"}
       aria-atomic="true"
       data-exiting={isExiting}
       className={message.className}

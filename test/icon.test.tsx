@@ -5,9 +5,9 @@ import type { FlashMessageOptions, FlashMessageType } from "../src/index";
 
 const show = (text: string, type: FlashMessageType = "info", options: FlashMessageOptions = {}) =>
   act(() => { ref.api.showFlashMessage(text, type, { duration: 0, ...options }); });
-// The toast root is the [role="alert"] ancestor of the text; the icon is its
+// The toast root is the alert/status ancestor of the text; the icon is its
 // only aria-hidden span (the close button is a labelled button, not hidden).
-const item = (text: string) => screen.getByText(text).closest('[role="alert"]');
+const item = (text: string) => screen.getByText(text).closest('[role="alert"], [role="status"]');
 const icon = (text: string) => item(text)?.querySelector('span[aria-hidden="true"]');
 
 describe("custom icons", () => {

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { act, screen, fireEvent } from "@testing-library/react";
 import { mount, ref } from "./helpers";
 
-const item = (text: string) => screen.getByText(text).closest('[role="alert"]') as HTMLElement;
+const item = (text: string) => screen.getByText(text).closest('[role="alert"], [role="status"]') as HTMLElement;
 // The progress bar is the item's only aria-hidden div (the icon is a span).
 const bar = (text: string) => item(text)?.querySelector('div[aria-hidden="true"]');
 const advance = (ms: number) => act(() => { vi.advanceTimersByTime(ms); });
