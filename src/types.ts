@@ -1,4 +1,5 @@
 import type { ReactNode, CSSProperties } from "react";
+import type { ConfettiOptions } from "./confetti";
 
 //  Message Types 
 export type FlashMessageType =
@@ -6,6 +7,7 @@ export type FlashMessageType =
   | "error"
   | "info"
   | "warning"
+  | "celebration"
 
 //  Position ─
 export type FlashMessagePosition =
@@ -27,6 +29,7 @@ export interface FlashMessage {
   type: FlashMessageType;
   duration?: number;
   transition?: TransitionPreset;
+  confetti?: boolean | ConfettiOptions;
 }
 
 //  Color Scheme 
@@ -64,12 +67,16 @@ export interface FlashMessageTheme {
 
   // Variant system: solid / outline / subtle
   variant?: "solid" | "outline" | "subtle";
+
+  // Base confetti options for celebration bursts
+  confetti?: ConfettiOptions;
 }
 
 //  Options ──
 export interface FlashMessageOptions {
   duration?: number;
   transition?: TransitionPreset;
+  confetti?: boolean | ConfettiOptions;
 }
 
 
@@ -87,6 +94,7 @@ export interface FlashMessageContextProps {
   setPosition: (position: FlashMessagePosition) => void;
   theme: FlashMessageTheme;
   setTheme: (theme: FlashMessageTheme) => void;
+  confetti: (options?: ConfettiOptions) => Promise<void>;
 }
 
 //  Provider Props ─
