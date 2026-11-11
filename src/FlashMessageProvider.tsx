@@ -95,6 +95,8 @@ export function FlashMessageProvider({
         duration,
         transition: options.transition,
         confetti: options.confetti,
+        icon: options.icon,
+        className: options.className,
       };
 
       setMessages((prev) => {

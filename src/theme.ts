@@ -74,7 +74,8 @@ export function resolveColor(
       bg: "transparent",
       dark: base.dark || fallback.dark,
       text: base.dark || fallback.dark,
-      icon: base.icon || fallback.icon,
+      // `??` (not `||`) so a user can pass "" to remove the icon.
+      icon: base.icon ?? fallback.icon,
     };
   }
 
@@ -83,7 +84,7 @@ export function resolveColor(
       bg: `${base.bg || fallback.bg}18`,
       dark: base.dark || fallback.dark,
       text: base.dark || fallback.dark,
-      icon: base.icon || fallback.icon,
+      icon: base.icon ?? fallback.icon,
     };
   }
 
@@ -91,7 +92,7 @@ export function resolveColor(
     bg: base.bg || fallback.bg,
     dark: base.dark || fallback.dark,
     text: base.text || fallback.text || "#ffffff",
-    icon: base.icon || fallback.icon,
+    icon: base.icon ?? fallback.icon,
   };
 }
 

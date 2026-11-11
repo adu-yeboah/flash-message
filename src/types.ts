@@ -30,6 +30,10 @@ export interface FlashMessage {
   duration?: number;
   transition?: TransitionPreset;
   confetti?: boolean | ConfettiOptions;
+  /** Overrides the type's icon. `null` hides the icon for this message. */
+  icon?: ReactNode | null;
+  /** Extra class for the message element, for custom styling. */
+  className?: string;
 }
 
 //  Color Scheme 
@@ -37,7 +41,7 @@ export interface ColorScheme {
   bg: string;
   dark: string;
   text?: string;
-  icon?: string;
+  icon?: ReactNode;
 }
 
 //  Theme 
@@ -77,6 +81,10 @@ export interface FlashMessageOptions {
   duration?: number;
   transition?: TransitionPreset;
   confetti?: boolean | ConfettiOptions;
+  /** Your own icon for this message: "🚀", <MyIcon />, <img src=… />. `null` = no icon. */
+  icon?: ReactNode | null;
+  /** Extra class for the message element, for custom styling. */
+  className?: string;
 }
 
 

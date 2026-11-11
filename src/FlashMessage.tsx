@@ -66,6 +66,10 @@ export default function FlashMessageItem({
   const isOutline = theme.variant === "outline";
   const isSubtle = theme.variant === "subtle";
 
+  // A per-message icon wins over the theme's icon; `null` means "no icon".
+  const icon = message.icon !== undefined ? message.icon : color.icon;
+  const hasIcon = icon != null && icon !== false && icon !== "";
+
   //  Determine animation
   const transition = message.transition ?? "slide";
   const isBottom = position.startsWith("bottom");
@@ -149,6 +153,7 @@ export default function FlashMessageItem({
       role="alert"
       aria-live="assertive"
       aria-atomic="true"
+      className={message.className}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       style={itemStyle}
@@ -164,8 +169,9 @@ export default function FlashMessageItem({
         }}
       >
         {/* Icon */}
-        {color.icon && (
+        {hasIcon && (
           <span
+            aria-hidden="true"
             style={{
               fontSize: "16px",
               flexShrink: 0,
@@ -181,7 +187,7 @@ export default function FlashMessageItem({
                   : "rgba(255,255,255,0.2)",
             }}
           >
-            {color.icon}
+            {icon}
           </span>
         )}
 
