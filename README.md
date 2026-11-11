@@ -13,6 +13,7 @@ A modern, lightweight, and fully customizable flash message library for React ap
 -  **TypeScript** - Full TypeScript support with type definitions
 -  **Animations** - Smooth enter/exit animations
 -  **Queue Management** - Handle multiple messages elegantly
+-  **Confetti** - Canvas confetti bursts for celebrations
 
 ##  Installation
 
@@ -80,7 +81,8 @@ const {
   position,            // Current position
   setPosition,         // Change position dynamically
   theme,               // Current theme
-  setTheme            // Change theme dynamically
+  setTheme,            // Change theme dynamically
+  confetti             // Fire a confetti burst on demand
 } = useFlashMessage();
 ```
 
@@ -89,9 +91,10 @@ const {
 ```tsx
 showFlashMessage(
   message: string,
-  type: "success" | "error" | "info" | "warning",
+  type: "success" | "error" | "info" | "warning" | "celebration",
   options?: {
     duration?: number // milliseconds, default: 3000
+    confetti?: boolean | ConfettiOptions // celebrate with confetti, see below
   }
 ): string // Returns message ID
 ```
@@ -102,6 +105,64 @@ showFlashMessage(
 - `error` - Red error messages
 - `info` - Blue informational messages
 - `warning` - Orange/yellow warning messages
+- `celebration` - Purple celebration messages with confetti
+
+##  Confetti
+
+`celebration` messages fire a confetti burst automatically, bursting from the
+message itself. Any other type can opt in, and celebrations can opt out:
+
+```tsx
+// Celebration fires confetti by default
+showFlashMessage('You did it!', 'celebration');
+
+// Turn it off
+showFlashMessage('Quiet win', 'celebration', { confetti: false });
+
+// Opt in for any type, with options
+showFlashMessage('Goal!', 'success', { confetti: { emojis: ['⚽', '🥅'] } });
+```
+
+Make every burst your own through the theme (`ConfettiOptions`):
+
+```tsx
+<FlashMessageProvider
+  defaultTheme={{
+    confetti: { particleCount: 120, colors: ['#ff0000', '#0000ff'] },
+  }}
+>
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `particleCount` | `80` | How many particles |
+| `angle` | `90` | Direction in degrees (90 = straight up) |
+| `spread` | `70` | Width of the fan in degrees |
+| `startVelocity` | `28` | Launch speed |
+| `gravity` | `1` | How fast particles fall |
+| `decay` | `0.93` | Speed kept each frame (lower stops sooner) |
+| `drift` | `0` | Constant sideways push (wind) |
+| `ticks` | `180` | Lifetime in frames (~60 per second) |
+| `scalar` | `1` | Size multiplier |
+| `origin` | `{x: 0.5, y: 0.6}` | Burst start, as 0–1 of the viewport |
+| `colors` | 6 defaults | CSS colors for the paper pieces |
+| `shapes` | all three | `square`, `circle`, `ribbon` |
+| `emojis` | `[]` | Use emoji as particles instead of paper |
+| `zIndex` | `10000` | CSS z-index of the confetti canvas |
+| `respectReducedMotion` | `true` | Skip the effect for reduced-motion users |
+| `drawParticle` | — | Draw each particle yourself on the canvas |
+
+Fire confetti without a message from the hook, or anywhere via the exported
+helpers:
+
+```tsx
+const { confetti } = useFlashMessage();
+confetti({ emojis: ['🎂'] }); // Promise resolves when the burst finishes
+
+import { fireConfetti, clearConfetti } from 'flashmessage-js';
+fireConfetti({ particleCount: 200 });
+clearConfetti(); // stop everything now
+```
 
 ### Positions
 
