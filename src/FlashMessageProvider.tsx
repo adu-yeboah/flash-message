@@ -18,6 +18,8 @@ import type {
   FlashMessageContextProps,
   FlashMessageProviderProps,
 } from "./types";
+import type { ConfettiOptions } from "./confetti";
+import { fireConfetti } from "./confetti";
 import { mergeTheme } from "./theme";
 import "./style.css";
 import FlashMessageItem from "./FlashMessage";
@@ -92,6 +94,7 @@ export function FlashMessageProvider({
         type,
         duration,
         transition: options.transition,
+        confetti: options.confetti,
       };
 
       setMessages((prev) => {
@@ -133,6 +136,12 @@ export function FlashMessageProvider({
     setMessages([]);
   }, []);
 
+  //  Fire a confetti burst on demand, using theme options as the base 
+  const confetti = useCallback(
+    (options?: ConfettiOptions) => fireConfetti({ ...theme.confetti, ...options }),
+    [theme.confetti]
+  );
+
   //  Memoized container styles 
   const containerStyle = useMemo(
     () => getContainerStyles(position, theme.gap ?? "10px"),
@@ -150,8 +159,9 @@ export function FlashMessageProvider({
       setPosition,
       theme,
       setTheme,
+      confetti,
     }),
-    [messages, showFlashMessage, dismissFlashMessage, clearAllMessages, position, theme]
+    [messages, showFlashMessage, dismissFlashMessage, clearAllMessages, position, theme, confetti]
   );
 
   return (

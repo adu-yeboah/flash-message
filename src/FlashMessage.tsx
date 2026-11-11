@@ -8,11 +8,12 @@ import React, {
 } from "react";
 import { FlashMessageItemProps, TransitionPreset } from "./types";
 import { resolveColor } from "./theme";
+import { fireConfetti, resolveMessageConfetti } from "./confetti";
 
 //  Animation Keyframe Map ──
 const ENTER_ANIMATION: Record<
   TransitionPreset,
-  Record<"top" | "bottom", string>
+  Record<"top" | "bottom", string>  
 > = {
   slide: {
     top: "fm-slide-in-top",
@@ -47,6 +48,8 @@ export default function FlashMessageItem({
   const [isExiting, setIsExiting] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(100);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const firedConfetti = useRef(false);
 
   // Stable ref for onDismiss to avoid stale closures in the timer
   const onDismissRef = useRef(onDismiss);
@@ -74,6 +77,26 @@ export default function FlashMessageItem({
     setIsExiting(true);
     setTimeout(() => onDismissRef.current(message.id), 350);
   }, [message.id]);
+
+  //  Fire confetti once, when the message first appears ──
+  useEffect(() => {
+    if (firedConfetti.current) return;
+    const options = resolveMessageConfetti(message.type, message.confetti, theme.confetti);
+    if (!options) return;
+    firedConfetti.current = true;
+    // Burst from the message itself unless the caller chose an origin
+    const rect = rootRef.current?.getBoundingClientRect();
+    const origin =
+      options.origin ??
+      (rect && rect.width > 0
+        ? {
+            x: (rect.left + rect.width / 2) / window.innerWidth,
+            y: (rect.top + rect.height / 2) / window.innerHeight,
+          }
+        : undefined);
+    void fireConfetti({ ...options, origin });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   //  Auto-dismiss timer with progress bar ─
   useEffect(() => {
@@ -122,6 +145,7 @@ export default function FlashMessageItem({
 
   return (
     <div
+      ref={rootRef}
       role="alert"
       aria-live="assertive"
       aria-atomic="true"
