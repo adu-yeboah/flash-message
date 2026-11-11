@@ -95,6 +95,8 @@ showFlashMessage(
   options?: {
     duration?: number // milliseconds, default: 3000
     confetti?: boolean | ConfettiOptions // celebrate with confetti, see below
+    icon?: ReactNode | null // your own icon; `null` hides the icon
+    className?: string // extra class for the message element
   }
 ): string // Returns message ID
 ```
@@ -106,6 +108,34 @@ showFlashMessage(
 - `info` - Blue informational messages
 - `warning` - Orange/yellow warning messages
 - `celebration` - Purple celebration messages with confetti
+
+##  Custom Icons & Styling
+
+Every message already shows its type's icon (✓ ✕ ℹ ⚠ 🎉). Override it per
+message with anything React can render, or hide it:
+
+```tsx
+showFlashMessage('Shipped!', 'success', { icon: '🚀' });
+showFlashMessage('Deploying', 'info', { icon: <MySpinner /> });
+showFlashMessage('No icon please', 'info', { icon: null });
+```
+
+Change a whole type's icon (and colors) through the theme:
+
+```tsx
+<FlashMessageProvider defaultTheme={{ success: { icon: '🌟' } }}>
+```
+
+A per-message `icon` beats the theme icon. For your own CSS, add a class to
+the message element and style it:
+
+```tsx
+showFlashMessage('Styled', 'info', { className: 'my-toast' });
+```
+
+```css
+.my-toast { text-transform: uppercase; }
+```
 
 ##  Confetti
 
