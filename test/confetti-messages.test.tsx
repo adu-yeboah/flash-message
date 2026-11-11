@@ -58,8 +58,15 @@ describe("confetti on messages", () => {
     expect(fire).toHaveBeenCalledWith(expect.objectContaining({ origin: { x: 0, y: 0 } }));
   });
 
-  // Note: "a queued celebration fires when it appears, not when it is queued"
-  // joins in the queue-stacking phase, together with the real queue behavior.
+  it("a queued celebration fires when it appears, not when it is queued", () => {
+    mount({ stacking: "queue", maxMessages: 1 });
+    let first = "";
+    act(() => { first = ref.api.showFlashMessage("first", "info"); });
+    act(() => { ref.api.showFlashMessage("party", "celebration"); });
+    expect(fire).not.toHaveBeenCalled();
+    act(() => ref.api.dismissFlashMessage(first));
+    expect(fire).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("confetti() from the hook", () => {

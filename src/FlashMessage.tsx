@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { FlashMessageItemProps, TransitionPreset } from "./types";
 import { resolveColor } from "./theme";
+import { toMs } from "./utils";
 import { fireConfetti, resolveMessageConfetti } from "./confetti";
 
 //  Animation Keyframe Map ──
@@ -47,7 +48,8 @@ export default function FlashMessageItem({
 }: FlashMessageItemProps) {
   const [isExiting, setIsExiting] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [progress, setProgress] = useState(100);
+  const [isFocused, setIsFocused] = useState(false);
+  const paused = isPaused || isFocused;
   const rootRef = useRef<HTMLDivElement>(null);
   const firedConfetti = useRef(false);
 
@@ -77,10 +79,11 @@ export default function FlashMessageItem({
   const enterAnimationName = ENTER_ANIMATION[transition][verticalKey];
 
   //  Dismiss handler (stable via ref) ──
+  const exitMs = toMs(theme.animationDuration);
   const handleDismiss = useCallback(() => {
     setIsExiting(true);
-    setTimeout(() => onDismissRef.current(message.id), 350);
-  }, [message.id]);
+    setTimeout(() => onDismissRef.current(message.id), exitMs);
+  }, [message.id, exitMs]);
 
   //  Fire confetti once, when the message first appears ──
   useEffect(() => {
@@ -102,26 +105,20 @@ export default function FlashMessageItem({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  //  Auto-dismiss timer with progress bar ─
+  //  Auto-dismiss: a single timeout, with the remaining time saved whenever it
+  //  is cancelled (hover, focus), so pausing never loses or adds time ──
+  const duration = message.duration ?? 0;
+  const hasTimer = duration > 0;
+  const remaining = useRef(duration);
   useEffect(() => {
-    if (!message.duration || isPaused) return;
-
-    const interval = 50;
-    const decrement = (interval / message.duration) * 100;
-
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        const next = prev - decrement;
-        if (next <= 0) {
-          handleDismiss();
-          return 0;
-        }
-        return next;
-      });
-    }, interval);
-
-    return () => clearInterval(timer);
-  }, [message.duration, isPaused, handleDismiss]);
+    if (!hasTimer || paused) return;
+    const startedAt = Date.now();
+    const timer = setTimeout(handleDismiss, remaining.current);
+    return () => {
+      clearTimeout(timer);
+      remaining.current = Math.max(0, remaining.current - (Date.now() - startedAt));
+    };
+  }, [hasTimer, paused, handleDismiss]);
 
   const itemStyle: React.CSSProperties = {
     backgroundColor: color.bg,
@@ -153,9 +150,15 @@ export default function FlashMessageItem({
       role="alert"
       aria-live="assertive"
       aria-atomic="true"
+      data-exiting={isExiting}
       className={message.className}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onFocus={() => setIsFocused(true)}
+      onBlur={(e) => {
+        // Focus moving between children of this message is not "leaving" it
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setIsFocused(false);
+      }}
       style={itemStyle}
       onClick={handleDismiss}
     >
@@ -237,9 +240,11 @@ export default function FlashMessageItem({
         )}
       </div>
 
-      {/* Progress bar */}
-      {message.duration && theme.showProgress !== false && (
+      {/* Progress bar — CSS animation, paused in sync with the timer.
+          hasTimer is a real boolean; `message.duration && ...` rendered a literal "0" */}
+      {hasTimer && theme.showProgress !== false && (
         <div
+          aria-hidden="true"
           style={{
             position: "absolute",
             bottom: 0,
@@ -249,8 +254,13 @@ export default function FlashMessageItem({
               isSubtle || isOutline
                 ? color.dark
                 : color.dark || "rgba(0,0,0,0.15)",
-            width: `${progress}%`,
-            transition: "width 0.05s linear",
+            width: "100%",
+            transformOrigin: "left",
+            animationName: "fm-progress",
+            animationDuration: `${duration}ms`,
+            animationTimingFunction: "linear",
+            animationFillMode: "forwards",
+            animationPlayState: paused ? "paused" : "running",
           }}
         />
       )}
