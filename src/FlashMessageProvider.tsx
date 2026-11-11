@@ -21,6 +21,7 @@ import type {
 import type { ConfettiOptions } from "./confetti";
 import { fireConfetti } from "./confetti";
 import { mergeTheme } from "./theme";
+import { addMessage, visibleMessages } from "./messages";
 import "./style.css";
 import FlashMessageItem from "./FlashMessage";
 
@@ -99,19 +100,7 @@ export function FlashMessageProvider({
         className: options.className,
       };
 
-      setMessages((prev) => {
-        if (stacking === "replace") {
-          return [newMsg];
-        }
-        if (stacking === "queue") {
-          const updated = [...prev, newMsg];
-          return updated.length > maxMessages
-            ? updated.slice(updated.length - maxMessages)
-            : updated;
-        }
-        const updated = [...prev, newMsg];
-        return updated.slice(-maxMessages);
-      });
+      setMessages((prev) => addMessage(prev, newMsg, stacking, maxMessages));
 
       return id;
     },
@@ -170,10 +159,10 @@ export function FlashMessageProvider({
     <FlashMessageContext.Provider value={contextValue}>
       {children}
 
-      {/* Message Container */}
+      {/* Message Container (queued messages wait their turn) */}
       {messages.length > 0 && (
         <div style={containerStyle}>
-          {messages.map((msg) => (
+          {visibleMessages(messages, maxMessages).map((msg) => (
             <div key={msg.id} style={{ pointerEvents: "auto" }}>
               <FlashMessageItem
                 message={msg}
