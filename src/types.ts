@@ -68,6 +68,8 @@ export interface FlashMessageTheme {
   progressHeight?: string;
   showProgress?: boolean;
   showCloseButton?: boolean;
+  /** Icons pop in with a springy scale as the message lands. Default true. */
+  iconPop?: boolean;
 
   // Variant system: solid / outline / subtle
   variant?: "solid" | "outline" | "subtle";

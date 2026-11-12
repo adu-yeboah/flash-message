@@ -146,6 +146,9 @@ export default function FlashMessageItem({
     typeof window.matchMedia === "function" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // The icon pops in with a springy scale, just after the toast lands.
+  const iconPop = theme.iconPop !== false && !prefersReducedMotion;
+
   const itemStyle: React.CSSProperties = {
     backgroundColor: color.bg,
     color: color.text || "#ffffff",
@@ -222,6 +225,16 @@ export default function FlashMessageItem({
                 isSubtle || isOutline
                   ? `${color.dark}20`
                   : "rgba(255,255,255,0.2)",
+              // Longhands so jsdom and tests can read them
+              ...(iconPop
+                ? {
+                    animationName: "fm-icon-pop",
+                    animationDuration: "0.4s",
+                    animationDelay: "0.2s",
+                    animationTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                    animationFillMode: "backwards",
+                  }
+                : {}),
             }}
           >
             {icon}

@@ -79,3 +79,17 @@
     transform: scaleX(0);
   }
 }
+
+/* Icon pop-in: delayed so it lands just after the toast settles.
+   Fill mode "backwards" holds scale(0) during the delay. */
+@keyframes fm-icon-pop {
+  0% {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
