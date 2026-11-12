@@ -156,7 +156,7 @@ export function drawDefaultParticle(ctx: CanvasRenderingContext2D, p: ConfettiPa
   }
 }
 
-// ─── Runner: one shared full-screen canvas, one animation loop ─────────────────
+// Runner: one shared full-screen canvas, one animation loop 
 interface Burst {
   remaining: number;
   resolve: () => void;
@@ -244,8 +244,6 @@ function frame(): void {
 
 /**
  * Fire one burst of confetti. Resolves when every particle has finished (or
- * immediately if the effect is skipped). Safe to call on the server: it does
- * nothing there.
  */
 export function fireConfetti(options: ConfettiOptions = {}): Promise<void> {
   if (typeof window === "undefined" || typeof document === "undefined") return Promise.resolve();
@@ -275,9 +273,6 @@ export function clearConfetti(): void {
 
 /**
  * What should a message fire?
- * - celebration messages fire by default; every other type only when asked
- * - `confetti: false` always turns it off
- * - an object customises it; the theme's confetti options are the base
  */
 export function resolveMessageConfetti(
   type: FlashMessageType,
