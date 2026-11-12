@@ -1,5 +1,12 @@
-export { FlashMessageProvider, useFlashMessage } from "./FlashMessage";
+export { FlashMessageProvider, useFlashMessage } from "./FlashMessageProvider";
 
+// Theme utilities
+export { defaultTheme, mergeTheme, resolveColor, MESSAGE_TYPES } from "./theme";
+
+// Confetti
+export { fireConfetti, clearConfetti } from "./confetti";
+
+// Types
 export type {
   FlashMessageType,
   FlashMessagePosition,
@@ -8,7 +15,13 @@ export type {
   FlashMessageTheme,
   FlashMessageOptions,
   FlashMessageContextProps,
-  FlashMessageProviderProps
+  FlashMessageProviderProps,
+  FlashMessageItemProps,
+  TransitionPreset,
 } from "./types";
 
-export { defaultTheme } from "./FlashMessage";
+export type {
+  ConfettiOptions,
+  ConfettiParticle,
+  ConfettiShape,
+} from "./confetti";

@@ -4,10 +4,11 @@ package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
-# Build output
-dist/
+# Build output (keep dist/ for published npm package)
 build/
 *.tsbuildinfo
+node_modules/
+dist/
 
 # IDE
 .vscode/
@@ -29,3 +30,6 @@ yarn-error.log*
 # Environment
 .env
 .env.local
+
+# test
+playground/
