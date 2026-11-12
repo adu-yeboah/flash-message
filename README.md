@@ -126,7 +126,14 @@ Change a whole type's icon (and colors) through the theme:
 <FlashMessageProvider defaultTheme={{ success: { icon: '🌟' } }}>
 ```
 
-A per-message `icon` beats the theme icon. For your own CSS, add a class to
+A per-message `icon` beats the theme icon. Icons pop in with a small spring
+animation as each message lands — turn it off with a theme for a quieter look:
+
+```tsx
+<FlashMessageProvider defaultTheme={{ iconPop: false }}>
+```
+
+For your own CSS, add a class to
 the message element and style it:
 
 ```tsx
